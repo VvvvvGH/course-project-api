@@ -1,0 +1,72 @@
+tags:
+  - project
+summary: 项目信息(已结束)
+parameters:
+  - in: path
+    name: project_id
+    required: true
+    type: string
+    description: 项目ID
+responses:
+    '200':
+      description: 已经结束的项目信息
+      schema:
+        "$ref": "#/definitions/Project_Ended"
+definitions:
+  Project_Ended:
+    type: object
+    properties:
+      ProjID:
+            type: string
+            #description: 采购项目编号
+      ProjTitle:
+            type: string
+            #description: 采购项目名称
+      ProjBud:
+            type: string
+            #description: 采购预算
+      PurMethod:
+            type: string
+            #description: 采购方式
+      SBs:
+            type: string
+            #description: 中标供应商
+      QuoteDetail:
+            type: string
+            #description: 报价明细
+      ServiceReq:
+            type: string
+            #description: 服务要求
+      Quantity:
+            type: string
+            #description: 数量
+      Currency:
+            type: string
+            #description: 货币
+      UnitPrice:
+            type: string
+            #description: 单价
+      FinalPrice:
+            type: string
+            #description: 中标、成交金额
+      ReviewDate:
+            type: string
+            #description: 评审日期
+      ReviewAddr:
+            type: string
+            #description: 评审地点
+      ReviewCommittee:
+            type: string
+            #description: 评审委员会（谈判小组、询价小组、磋商小组或单一来源采购小组）
+      Manager:
+            type: string
+            #description: 负责人
+      ReviewComment:
+            type: string
+            #description: 评审意见
+      AnnounceDDL:
+            type: string
+            #description: 公告期限
+      Attachment:
+            type: string
+            #description: 附件

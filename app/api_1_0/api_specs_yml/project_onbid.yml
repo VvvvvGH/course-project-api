@@ -1,0 +1,66 @@
+tags:
+- project
+summary: 项目信息(未结束)
+parameters:
+  - in: path
+    name: project_id
+    required: true
+    type: string
+    description: 项目ID
+responses:
+  '200':
+      description: 未结束的项目信息
+      schema:
+        "$ref": "#/definitions/Project_Onbid"
+definitions:
+  Project_Onbid:
+    type: object
+    properties:
+      ProjID:
+            type: string
+            #description: 采购项目编号
+      ProjTitle:
+            type: string
+            #description: 采购项目名称
+      City:
+            type: string
+            #description: 采购城市
+      ProjBud:
+            type: string
+            #description: 采购预算
+      PurQuantity:
+            type: string
+            #description: 采购数量
+      ProjReq:
+            type: string
+            #description: 采购项目内容及需求
+      SupplierQuals:
+            type: string
+            #description: 供应商资格
+      DDL:
+            type: string
+            #description: 投标截止时间
+      Addr:
+            type: string
+            #description: 提交投标文件地点
+      BidStartTime:
+            type: string
+            #description: 开标时间
+      BidStartAddr:
+            type: string
+            #description: 开标地点
+      BidBond:
+            type: string
+            #description: 投标保证金
+      AnnounceDDL:
+            type: string
+            #description: 公告期限
+      Publisher:
+            type: string
+            #description: 发布人
+      PubDate:
+            type: string
+            #description: 发布时间
+      Attachment:
+            type: string
+            #description: 附件

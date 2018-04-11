@@ -1,0 +1,41 @@
+tags:
+  - project
+summary: 项目信息
+responses:
+    '200':
+      description: 项目信息
+      schema:
+        "$ref": "#/definitions/Project"
+definitions:
+  Project:
+    type: object
+    properties:
+      ProjectStatistics:
+            type: object
+            properties:
+                TotalNumber:
+                  type: integer
+                Onbid:
+                  type: integer
+                Corrected:
+                  type: integer
+                Ended:
+                  type: integer
+      Cities:
+            type: array
+            items:
+              type: object
+              properties:
+                City:
+                  type: string
+                URL:
+                  type: string
+                TotalNumber:
+                  type: integer
+                Onbid:
+                  type: integer
+                Corrected:
+                  type: integer
+                Ended:
+                  type: integer
+

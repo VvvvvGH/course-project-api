@@ -1,0 +1,24 @@
+tags:
+- project
+summary: 项目信息(更正)
+parameters:
+  - in: path
+    name: project_id
+    required: true
+    type: string
+    description: 项目ID
+responses:
+    '200':
+      description: 项目更正信息
+      schema:
+        "$ref": "#/definitions/Project_Corrected"
+definitions:
+  Project_Corrected:
+    type: object
+    properties:
+      ProjID:
+        type: string
+        #description: 采购项目编号
+      Content:
+        type: string
+        #description: 更改事项及内容
