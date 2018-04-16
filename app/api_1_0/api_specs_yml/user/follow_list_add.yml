@@ -1,0 +1,30 @@
+tags:
+- user
+summary: 添加项目关注
+description: 添加项目关注
+parameters:
+  - in: body
+    name: project
+    description: 添加项目关注
+    schema:
+      type: object
+      required:
+      - project_id
+      properties:
+        project_id:
+          type: string
+responses:
+  '200':
+    description: 添加项目关注
+    schema:
+      "$ref": "#/definitions/follow_list_add"
+
+definitions:
+  follow_list_add:
+    type: object
+    required:
+    - message
+    properties:
+      message:
+        type: string
+        example: 项目添加成功/项目ID不存在

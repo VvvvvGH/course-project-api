@@ -1,0 +1,30 @@
+tags:
+- user
+summary: 删除项目关注
+description: 删除项目关注
+parameters:
+  - in: body
+    name: project
+    description: 删除项目关注
+    schema:
+      type: object
+      required:
+      - project_id
+      properties:
+        project_id:
+          type: string
+responses:
+  '200':
+    description: 删除项目关注
+    schema:
+      "$ref": "#/definitions/follow_list_delete"
+
+definitions:
+  follow_list_delete:
+    type: object
+    required:
+    - message
+    properties:
+      message:
+        type: string
+        example: 项目删除成功/项目ID不存在

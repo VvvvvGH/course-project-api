@@ -5,7 +5,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     """ General configuration """
-    # TODO: Configutation
+    # TODO: Configuration
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_DATABASE_URI = ""
     # It significant overhead and will be disabled by default in the future.

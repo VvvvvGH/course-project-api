@@ -1,0 +1,29 @@
+tags:
+  - project
+summary: 城市列表
+responses:
+    '200':
+      description: 城市列表
+      schema:
+        "$ref": "#/definitions/Cities"
+definitions:
+  Cities:
+    type: object
+    properties:
+      Page:
+        type: object
+        properties:
+          PageCount:
+            type: integer
+          CurrentPage:
+            type: integer
+          ItemsPerPage:
+            type: integer
+      Cities:
+            type: object
+            properties:
+              GZ:
+                type: string
+                example: "/api/1.0/project/cities/GZ"
+
+

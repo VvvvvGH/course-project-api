@@ -15,11 +15,11 @@ definitions:
             properties:
                 TotalNumber:
                   type: integer
-                Onbid:
+                procurement_notices:
                   type: integer
-                Corrected:
+                correction_notice:
                   type: integer
-                Ended:
+                bid_notice:
                   type: integer
       Cities:
             type: array
@@ -32,10 +32,9 @@ definitions:
                   type: string
                 TotalNumber:
                   type: integer
-                Onbid:
+                procurement_notices:
                   type: integer
-                Corrected:
+                correction_notice:
                   type: integer
-                Ended:
+                bid_notice:
                   type: integer
-

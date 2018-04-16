@@ -23,9 +23,9 @@ def index():
     })
 
 
-@api.route('/project/onbid/<string:project_id>')
-@swag_from('api_specs_yml/project_onbid.yml')
-def onbid(project_id):
+@api.route('/project/procurement_notices/<string:project_id>', methods=['GET'])
+@swag_from('api_specs_yml/project/project_procurement_notices.yml')
+def procurement_notices(project_id):
     # TODO: Get data from MySQL
     """
     正在进行的项目
@@ -51,8 +51,8 @@ def onbid(project_id):
     return jsonify(data)
 
 
-@api.route('/project/corrected/<string:project_id>')
-@swag_from('api_specs_yml/project_corrected.yml')
+@api.route('/project/correction_notice/<string:project_id>', methods=['GET'])
+@swag_from('api_specs_yml/project/project_correction_notice.yml')
 def corrected(project_id):
     # TODO: Get data from MySQL
     """
@@ -65,8 +65,8 @@ def corrected(project_id):
     return jsonify(data)
 
 
-@api.route('/project/ended/<string:project_id>')
-@swag_from('api_specs_yml/project_ended.yml')
+@api.route('/project/bid_notice/<string:project_id>', methods=['GET'])
+@swag_from('api_specs_yml/project/project_bid_notice.yml')
 def ended(project_id):
     # TODO: Get data from MySQL
     """
@@ -95,8 +95,8 @@ def ended(project_id):
     return jsonify(data)
 
 
-@api.route('/project')
-@swag_from('api_specs_yml/project.yml')
+@api.route('/project', methods=['GET'])
+@swag_from('api_specs_yml//project/project.yml')
 def project_basic_info():
     # TODO: Get data from MySQL
     """
@@ -107,26 +107,26 @@ def project_basic_info():
 
         "ProjectStatistics": {
             "TotalNumber": 65444,
-            "Onbid": 54441,
-            "Corrected": 564,
-            "Ended": 4547,
+            "procurement_notices": 54441,
+            "correction_notice": 564,
+            "bid_notice": 4547,
         },
         "Cities": [
             {
                 "City": "GZ",
                 "URL": "/project/cities/GZ",
                 "TotalNumber": 544,
-                "Onbid": 556,
-                "Corrected": 466,
-                "Ended": 4666,
+                "procurement_notices": 54441,
+                "correction_notice": 564,
+                "bid_notice": 4547,
             },
             {
                 "City": "FS",
                 "URL": "/project/cities/FS",
                 "TotalNumber": 5435,
-                "Onbid": 53545,
-                "Corrected": 35256,
-                "Ended": 4626,
+                "procurement_notices": 54441,
+                "correction_notice": 564,
+                "bid_notice": 4547,
             },
 
         ]
@@ -134,23 +134,77 @@ def project_basic_info():
     return jsonify(data)
 
 
-@api.route('/project/cities/<string:city>')
-def city(city):
+@api.route('/project/cities', methods=['GET'])
+@swag_from('api_specs_yml/project/cities.yml')
+def city_list():
     # TODO: Get data from MySQL
     """
-    项目列表分类
+    城市列表
     """
     data = {
         "Page": {
             "PageCount": 100,
             "CurrentPage": 1,
-            "ProjectPerPage": 10,
+            "ItemsPerPage": 10,
         },
-        "ProjectList": [
+        "Cities":
             {
-                "ProjID": "DDSDDSDS",
-                "URL": "/project/" + "onbid/" + "<ProjID>"
+                "GZ": "/api/1.0/project/cities/GZ",
+                "FS": "/api/1.0/project/cities/FS"
+            }
+    }
+    return jsonify(data)
 
+
+@api.route('/project/cities/<string:city>', methods=['GET'])
+@swag_from('api_specs_yml/project/project_city.yml')
+def city(city):
+    # TODO: Get data from MySQL
+    """
+    城市下的项目列表
+    """
+    data = {
+        "Page": {
+            "PageCount": 100,
+            "CurrentPage": 1,
+            "ItemsPerPage": 10,
+        },
+        "Project": [
+            {
+                "ProjID": "adsa",
+                "ProjTitle": "项目名称",
+                "City": city,
+                "PubDate": "2018-4-21",
+                "DDL": "2018-4-25",
+                "Type": "{procurement_notices, correction_notice, bid_notice}"
+            }
+        ]
+    }
+    return jsonify(data)
+
+
+@api.route('/project/project_list', methods=['GET'])
+@swag_from('api_specs_yml/project/project_list.yml')
+def project_list():
+    # TODO: Get data from MySQL
+    """
+    项目列表
+    """
+    data = {
+        "Page": {
+            "PageCount": 100,
+            "CurrentPage": 1,
+            "ItemsPerPage": 10,
+        },
+        "Project": [
+            {
+                "ProjID": "项目ID",
+                "ProjTitle": "项目名称",
+                "City": "city",
+                "PubDate": "2018-4-21",
+                "DDL": "2018-4-25",
+                "Type": "{procurement_notices, correction_notice, bid_notice}",
+                "URL": "/project/bid_notice/FS4456444"
             }
         ]
     }

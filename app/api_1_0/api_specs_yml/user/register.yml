@@ -1,0 +1,67 @@
+tags:
+- user
+summary: 用户注册
+description: 用户注册
+parameters:
+  - in: body
+    name: user
+    description: 创建用户
+    schema:
+      type: object
+      required:
+      - userName
+      - passWord
+      - gender
+      - birthday
+      - phone
+      - email
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+        gender:
+          type: string
+        birthday:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+responses:
+  '200':
+    description: 返回用户相关信息
+    schema:
+      "$ref": "#/definitions/User"
+
+definitions:
+  User:
+    type: object
+    required:
+    - uuid
+    - name
+    - login_state
+    - last_login
+    - subscritions
+    - activated
+    properties:
+      uuid:
+        type: string
+        format: uuid
+        example: 2b232156-3bbe-4e5d-a379-9e59b8e7b81a
+      username:
+        type: string
+        example: Cheng
+      activated:
+        type: boolean
+        example: false
+      login_state:
+        type: boolean
+        example: false
+      last_login:
+        type: string
+        format: date
+        example: 24 Mar 2018 15:51:25
+      subscriptions:
+        type: string
+        example: "/user/subs"

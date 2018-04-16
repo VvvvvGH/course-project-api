@@ -1,0 +1,52 @@
+tags:
+- user
+summary: 添加订阅信息
+description: 添加订阅信息
+parameters:
+  - in: path
+    name: subs_filter
+    description: 添加订阅信息
+    schema:
+      type: object
+      properties:
+        subs_filter:
+          type: string
+responses:
+  '200':
+    description: 添加订阅信息
+    schema:
+      "$ref": "#/definitions/ProjList"
+
+definitions:
+  ProjList:
+    type: object
+    properties:
+      Page:
+        type: object
+        properties:
+          PageCount:
+            type: integer
+          CurrentPage:
+            type: integer
+          ItemsPerPage:
+            type: integer
+      Project:
+        type: array
+        items:
+           type: object
+           properties:
+              ProjID:
+                type: string
+              ProjTitle:
+                type: string
+              City:
+                type: string
+              PubDate:
+                type: date
+              DDL:
+                type: date
+              Type:
+                type: string
+              URL:
+                type: string
+                #"{procurement_notices, correction_notice, bid_notice}"
