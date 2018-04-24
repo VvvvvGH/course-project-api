@@ -1,6 +1,9 @@
 from . import api
 from flask import jsonify, request
 from flasgger import swag_from
+from app import db
+from app.models import *
+from sqlalchemy import exc
 
 
 @api.route('/user', methods=['GET'])
@@ -9,13 +12,14 @@ def user():
     """
     查询用户信息
     """
+    user_data = User.query.filter_by(UserName="Idiots").first_or_404()
     data = {
-        "activated": True,
-        "last_login": "24 Mar 2018 15:51:25",
+        "activated": user_data.Activated,
+        "last_login": user_data.LastLogin,
         "login_state": True,
-        "subscriptions": "/user/focus",
-        "username": "Cheng",
-        "uuid": "2b232156-3bbe-4e5d-a379-9e59b8e7b81a"
+        "subscriptions": "/user/subs",
+        "username": user_data.UserName,
+        "uuid": user_data.UUID
     }
     return jsonify(data)
 
@@ -26,13 +30,27 @@ def register():
     """
     用户注册
     """
+    # 尝试添加用户
+    try:
+        new_user = User(username=request.json['userName'], email=request.json['email'],
+                        birthday=request.json['birthday'],
+                        gender=request.json['gender'], password=request.json['password'],
+                        telephone=request.json['phone'])
+        db.session.add(new_user)
+        db.session.commit()
+    except exc.SQLAlchemyError:
+        # 发生错误，回滚
+        db.session.rollback()
+        return jsonify({"error": "User add failed."})
+
+    user_data = User.query.filter_by(UserName=request.json['userName']).first()
     data = {
-        "activated": False,
-        "last_login": "24 Mar 2018 15:51:25",
-        "login_state": False,
+        "activated": user_data.Activated,
+        "last_login": user_data.LastLogin,
+        "login_state": True,
         "subscriptions": "/user/subs",
-        "username": "Cheng",
-        "uuid": "2b232156-3bbe-4e5d-a379-9e59b8e7b81a"
+        "username": user_data.UserName,
+        "uuid": user_data.UUID
     }
     return jsonify(data)
 
@@ -67,21 +85,23 @@ def follow_list():
     """
     关注列表
     """
+
+    project = UserFocus.query.filter_by(UUID="1c64ba58-455b-11e8-bf9c-00dbdfbc5c37").first_or_404()
     data = {
         "Page": {
-            "PageCount": 100,
+            "PageCount": 1,
             "CurrentPage": 1,
             "ItemsPerPage": 10,
         },
         "Project": [
             {
-                "ProjID": "项目ID",
+                "ProjID": project.ProjID,
                 "ProjTitle": "项目名称",
                 "City": "city",
                 "PubDate": "2018-4-21",
                 "DDL": "2018-4-25",
                 "Type": "{procurement_notices, correction_notice, bid_notice}",
-                "URL": "/project/bid_notice/FS4456444"
+                "URL": "/project/bid_notice/" + project.ProjID
             }
         ]
     }

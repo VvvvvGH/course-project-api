@@ -29,7 +29,7 @@ def error_400(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '400 Bad request',
+                'Error': '400 Bad request.',
             }
         )
         return response, 400
@@ -86,7 +86,7 @@ def error_405(e):
                 'Error': '405 Method not allowed',
             }
         )
-        return response, 403
+        return response, 405
     else:
         return render_template('errors.html', error_msg=e, error_code=405), 405
 
@@ -104,6 +104,6 @@ def error_405(e):
                 'Error': '500 Internal server error',
             }
         )
-        return response, 403
+        return response, 500
     else:
         return render_template('errors.html', error_msg=e, error_code=500), 500

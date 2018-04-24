@@ -31,7 +31,7 @@ definitions:
       PurQuantity:
             type: string
             #description: 采购数量
-      ProjReq:
+      ProjReqURL:
             type: string
             #description: 采购项目内容及需求
       SupplierQuals:

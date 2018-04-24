@@ -10,20 +10,9 @@ definitions:
   Cities:
     type: object
     properties:
-      Page:
-        type: object
-        properties:
-          PageCount:
-            type: integer
-          CurrentPage:
-            type: integer
-          ItemsPerPage:
-            type: integer
       Cities:
-            type: object
-            properties:
-              GZ:
-                type: string
-                example: "/api/1.0/project/cities/GZ"
+            type: array
+            items:
+              name: "GZ"
 
 

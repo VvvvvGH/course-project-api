@@ -1,6 +1,7 @@
 from . import api
-from flask import jsonify
+from flask import jsonify, request
 from flasgger import swag_from
+from .project_models import *
 
 
 @api.route('/')
@@ -23,114 +24,49 @@ def index():
     })
 
 
-@api.route('/project/procurement_notices/<string:project_id>', methods=['GET'])
+@api.route('/project/procurement_notices/<string:ProjectID>', methods=['GET'])
 @swag_from('api_specs_yml/project/project_procurement_notices.yml')
-def procurement_notices(project_id):
-    # TODO: Get data from MySQL
+def project_ongoing(ProjectID):
     """
     正在进行的项目
     """
-    data = {
-        "ProjID": project_id,
-        "ProjTitle": "",
-        "City": "",
-        "ProjBud": "",
-        "PurQuantity": "",
-        "ProjReq": "",
-        "SupplierQuals": "",
-        "DDL": "",
-        "Addr": "",
-        "BidStartTime": "",
-        "BidStartAddr": "",
-        "BidBond": "",
-        "AnnounceDDL": "",
-        "Publisher": "",
-        "PubDate": "",
-        "Attachment": "",
-    }
+
+    data = ProjectOngoing.query.filter_by(ProjID=str(ProjectID)).first_or_404().to_json()
+
     return jsonify(data)
 
 
-@api.route('/project/correction_notice/<string:project_id>', methods=['GET'])
+@api.route('/project/correction_notice/<string:ProjectID>', methods=['GET'])
 @swag_from('api_specs_yml/project/project_correction_notice.yml')
-def corrected(project_id):
-    # TODO: Get data from MySQL
+def project_corrected(ProjectID):
     """
     项目更正信息
     """
-    data = {
-        "ProjID": project_id,
-        "Content": "更正事项与内容",
-    }
+    data = ProjectCorrected.query.filter_by(ProjID=str(ProjectID)).first_or_404().to_json()
+
     return jsonify(data)
 
 
-@api.route('/project/bid_notice/<string:project_id>', methods=['GET'])
+@api.route('/project/bid_notice/<string:ProjectID>', methods=['GET'])
 @swag_from('api_specs_yml/project/project_bid_notice.yml')
-def ended(project_id):
-    # TODO: Get data from MySQL
+def project_ended(ProjectID):
     """
     已经结束的项目
     """
-    data = {
-        "ProjID": project_id,
-        "ProjTitle": "",
-        "ProjBud": "",
-        "PurMethod": "",
-        "SBs": "",
-        "QuoteDetail": "",
-        "ServiceReq": "",
-        "Quantity": "",
-        "Currency": "",
-        "UnitPrice": "",
-        "FinalPrice": "",
-        "ReviewDate": "",
-        "ReviewAddr": "",
-        "ReviewCommittee": "",
-        "Manager": "",
-        "ReviewComment": "",
-        "AnnounceDDL": "",
-        "Attachment": "",
-    }
+    data = ProjectEnded.query.filter_by(ProjID=str(ProjectID)).first_or_404().to_json()
+
     return jsonify(data)
 
 
 @api.route('/project', methods=['GET'])
-@swag_from('api_specs_yml//project/project.yml')
+@swag_from('api_specs_yml/project/project.yml')
 def project_basic_info():
     # TODO: Get data from MySQL
     """
     项目各城市统计信息
     城市分类链接
     """
-    data = {
-
-        "ProjectStatistics": {
-            "TotalNumber": 65444,
-            "procurement_notices": 54441,
-            "correction_notice": 564,
-            "bid_notice": 4547,
-        },
-        "Cities": [
-            {
-                "City": "GZ",
-                "URL": "/project/cities/GZ",
-                "TotalNumber": 544,
-                "procurement_notices": 54441,
-                "correction_notice": 564,
-                "bid_notice": 4547,
-            },
-            {
-                "City": "FS",
-                "URL": "/project/cities/FS",
-                "TotalNumber": 5435,
-                "procurement_notices": 54441,
-                "correction_notice": 564,
-                "bid_notice": 4547,
-            },
-
-        ]
-    }
+    data = CityStatics().to_json()
     return jsonify(data)
 
 
@@ -141,18 +77,11 @@ def city_list():
     """
     城市列表
     """
-    data = {
-        "Page": {
-            "PageCount": 100,
-            "CurrentPage": 1,
-            "ItemsPerPage": 10,
-        },
-        "Cities":
-            {
-                "GZ": "/api/1.0/project/cities/GZ",
-                "FS": "/api/1.0/project/cities/FS"
-            }
-    }
+    data = {"Cities": []}
+    city_list = ['GD', 'GZ', 'SZ', 'ZH', 'ST', 'SG', 'FS', 'JM', 'ZJ', 'MM', 'HZ', 'MZ', 'SW', 'HY', 'YZ', 'QY',
+                 'DG', 'ZS', 'JY', 'YF', 'SD']
+    for city in city_list:
+        data['Cities'].append(city)
     return jsonify(data)
 
 
@@ -163,6 +92,7 @@ def city(city):
     """
     城市下的项目列表
     """
+    # FIXME: Fix this list
     data = {
         "Page": {
             "PageCount": 100,
@@ -190,22 +120,17 @@ def project_list():
     """
     项目列表
     """
-    data = {
-        "Page": {
-            "PageCount": 100,
-            "CurrentPage": 1,
-            "ItemsPerPage": 10,
-        },
-        "Project": [
-            {
-                "ProjID": "项目ID",
-                "ProjTitle": "项目名称",
-                "City": "city",
-                "PubDate": "2018-4-21",
-                "DDL": "2018-4-25",
-                "Type": "{procurement_notices, correction_notice, bid_notice}",
-                "URL": "/project/bid_notice/FS4456444"
-            }
-        ]
-    }
+
+    if 'CurrentPage' in request.args:
+        current_page = int(request.args['CurrentPage'])
+    else:
+        current_page = 1
+    if 'ItemsPerPage' in request.args:
+        items_per_page = int(request.args['ItemsPerPage'])
+    else:
+        items_per_page = 10
+
+    project_type = request.args['ProjectType']
+    data = ProjectList(current_page=current_page, items_per_page=items_per_page,
+                       project_type=project_type).to_json()
     return jsonify(data)

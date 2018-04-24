@@ -4,23 +4,25 @@ summary: 项目列表
 
 parameters:
   - in: query
-    name: project_type
-    type: string
-    description:  项目类型　包含　(procurement_notices, correction_notice, bid_notice)
+    name: ProjectType
+    required: ture
+    type: integer
+    description:  项目类型　采购公告0　更正公告1　中标公告2
   - in: query
-    name: city
+    name: City
     type: string
-    description: 项目城市
+    description: 项目城市 GZ FS
   - in: query
-    name: order_by_start_time
-    description:  默认是order_by_start_time
+    name: OrderByStartTime
+    description:  默认是order by start time
     type: boolean
   - in: query
-    name: order_by_ddl
+    name: OrderByDDL
     type: boolean
     description: 根据ddl排序
   - in: query
     name: CurrentPage
+    required: ture
     type: integer
     description: 当前页面
   - in: query

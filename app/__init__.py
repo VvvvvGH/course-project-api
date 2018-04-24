@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 # TODO: Import Email
 # TODO: SQLAlchemy
 
-# db = SQLAlchemy()
+db = SQLAlchemy(use_native_unicode='utf8')
 
 
 def create_app(config_name):
@@ -26,7 +26,7 @@ def create_app(config_name):
     from .main import main as main_route
     app.register_blueprint(main_route, url_prefix='/')
 
-    # 数据库 TODO: 连接数据库
-    #db.init_app(app)
+    # 数据库
+    db.init_app(app)
 
     return app
