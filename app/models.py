@@ -2,9 +2,10 @@ from app import db
 import uuid
 import hashlib
 from datetime import datetime
+from app.exceptions import *
 
 
-class User(db.Model):
+class UserMixin(db.Model):
     __tablename__ = 'users'
     UUID = db.Column(db.String(40), primary_key=True)
     UserName = db.Column(db.String(40), nullable=False, unique=True)

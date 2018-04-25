@@ -3,6 +3,7 @@ from flask import jsonify, request
 from flasgger import swag_from
 from app import db
 from app.models import *
+from .user_models import *
 from sqlalchemy import exc
 
 
@@ -12,16 +13,8 @@ def user():
     """
     查询用户信息
     """
-    user_data = User.query.filter_by(UserName="Idiots").first_or_404()
-    data = {
-        "activated": user_data.Activated,
-        "last_login": user_data.LastLogin,
-        "login_state": True,
-        "subscriptions": "/user/subs",
-        "username": user_data.UserName,
-        "uuid": user_data.UUID
-    }
-    return jsonify(data)
+    user_data = User.query.filter_by(UserName="Idiots").first_or_404().to_json()
+    return jsonify(user_data)
 
 
 @api.route('/user', methods=['POST'])
@@ -32,10 +25,7 @@ def register():
     """
     # 尝试添加用户
     try:
-        new_user = User(username=request.json['userName'], email=request.json['email'],
-                        birthday=request.json['birthday'],
-                        gender=request.json['gender'], password=request.json['password'],
-                        telephone=request.json['phone'])
+        new_user = User.from_json(request.json)
         db.session.add(new_user)
         db.session.commit()
     except exc.SQLAlchemyError:
@@ -43,16 +33,8 @@ def register():
         db.session.rollback()
         return jsonify({"error": "User add failed."})
 
-    user_data = User.query.filter_by(UserName=request.json['userName']).first()
-    data = {
-        "activated": user_data.Activated,
-        "last_login": user_data.LastLogin,
-        "login_state": True,
-        "subscriptions": "/user/subs",
-        "username": user_data.UserName,
-        "uuid": user_data.UUID
-    }
-    return jsonify(data)
+    user_data = User.query.filter_by(UserName=request.json['userName']).first_or_404().to_json()
+    return jsonify(user_data)
 
 
 @api.route('/user/reset_password', methods=['POST'])
