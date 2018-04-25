@@ -1,4 +1,5 @@
 from . import api
+from app.exceptions import *
 from flask import jsonify, request, render_template
 
 
@@ -11,7 +12,7 @@ def error_404(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '404 not find',
+                'Error': '404 not find' + str(e),
             }
         )
         return response, 404
@@ -29,7 +30,7 @@ def error_400(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '400 Bad request.',
+                'Error': '400 Bad request.' + str(e),
             }
         )
         return response, 400
@@ -47,7 +48,7 @@ def error_401(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '401 Unauthorized',
+                'Error': '401 Unauthorized' + str(e),
             }
         )
         return response, 401
@@ -65,7 +66,7 @@ def error_403(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '403 Forbidden',
+                'Error': '403 Forbidden' + str(e),
             }
         )
         return response, 403
@@ -83,7 +84,7 @@ def error_405(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '405 Method not allowed',
+                'Error': '405 Method not allowed' + str(e),
             }
         )
         return response, 405
@@ -101,9 +102,14 @@ def error_405(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '500 Internal server error',
+                'Error': '500 Internal server error' + str(e),
             }
         )
         return response, 500
     else:
         return render_template('errors.html', error_msg=e, error_code=500), 500
+
+
+@api.app_errorhandler(ValidationError)
+def validation_error(e):
+    return error_400(e)

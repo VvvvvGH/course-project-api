@@ -3,7 +3,7 @@ tags:
 summary: 项目信息(未结束)
 parameters:
   - in: path
-    name: project_id
+    name: ProjectID
     required: true
     type: string
     description: 项目ID

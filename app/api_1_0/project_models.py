@@ -3,7 +3,7 @@ from app import db
 from sqlalchemy import func
 
 
-class ProjectOngoing(PurchaseNotice):
+class ProjectOngoing(PurchaseNotice, db.Model):
     def to_json(self):
         json_data = {
             "ProjID": self.ProjID,
@@ -26,7 +26,7 @@ class ProjectOngoing(PurchaseNotice):
         return json_data
 
 
-class ProjectCorrected(CorrectedNotice):
+class ProjectCorrected(CorrectedNotice, db.Model):
     def to_json(self):
         json_data = {
             "ProjID": self.ProjID,
@@ -35,7 +35,7 @@ class ProjectCorrected(CorrectedNotice):
         return json_data
 
 
-class ProjectEnded(BidNotice):
+class ProjectEnded(BidNotice, db.Model):
     def to_json(self):
         json_data = {
             "ProjID": self.ProjID,
