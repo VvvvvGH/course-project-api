@@ -38,7 +38,8 @@
             <!-- Navigation -->
             <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href="/">主页</a>
-                <a class="mdl-navigation__link" onclick="show_page('/apidocs')">API 文档</a>
+                <a class="mdl-navigation__link" onclick="show_page('{{ url_for('flasgger.apidocs',_external=True)}} ')">API
+                    文档</a>
                 <a class="mdl-navigation__link" onclick="show_page('https://coding.net/u/Vistazx1/p/simple-api/')">API
                     源码</a>
             </nav>
@@ -48,7 +49,8 @@
         <span class="mdl-layout-title">Welcome</span>
         <nav class="mdl-navigation">
             <a class="mdl-navigation__link" href="/">主页</a>
-            <a class="mdl-navigation__link" onclick="show_page('/apidocs')">API 文档</a>
+            <a class="mdl-navigation__link" onclick="show_page('{{ url_for('flasgger.apidocs',_external=True)}} ')">API
+                文档</a>
             <a class="mdl-navigation__link" onclick="show_page('https://coding.net/u/Vistazx1/p/simple-api/')">API
                 源码</a>
         </nav>
@@ -85,7 +87,7 @@
 
                         <div class="mdl-card__actions mdl-card--border">
                             <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
-                                    onclick="show_page('/apidocs')">
+                                    onclick="show_page('{{ url_for('flasgger.apidocs',_external=True)}} ')">
                                 API 文档
                             </button>
                             <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect"
@@ -101,7 +103,7 @@
                 </div>
             </div>
 
-
+            <a></a>
         </div>
     </main>
 </div>
@@ -112,7 +114,7 @@
 
 <script>
     function show_page(page) {
-        document.getElementById('frame').innerHTML = '<iframe src=' + page + ' width="100%" height="1000px"  frameborder="0"></iframe>';
+        document.getElementById('frame').innerHTML = '<iframe id="new_frame" src=' + page + ' width="100%" height="1000px"  frameborder="0"></iframe>';
     }
 
     function changeFrameHeight() {
@@ -131,6 +133,6 @@
 <link rel="stylesheet" href="{{ url_for('static',filename='css/material.min.css') }}">
 <script src="{{url_for('static',filename='js/material.min.js')}} "></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
 
 </html>

@@ -2,7 +2,7 @@ from flask import Flask
 from config import config
 from flasgger import Swagger
 from flask_sqlalchemy import SQLAlchemy
-
+from werkzeug.contrib.fixers import ProxyFix
 # TODO: Import Email
 # TODO: SQLAlchemy
 
@@ -14,6 +14,13 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
+
+    # ProxyFix
+    # 修复使用nginx 反向代理启用https产生的问题
+    # 需在nginx配置文件内添加以下内容
+    # proxy_set_header   Host $host;
+    # proxy_set_header   X-Forwarded-Proto  $scheme;
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     # Swagger
     swagger = Swagger(app)
