@@ -12,7 +12,7 @@ def error_404(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '404 not find' + str(e),
+                'Error': str(e),
             }
         )
         return response, 404
@@ -30,7 +30,7 @@ def error_400(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '400 Bad request.' + str(e),
+                'Error': str(e),
             }
         )
         return response, 400
@@ -48,7 +48,7 @@ def error_401(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '401 Unauthorized' + str(e),
+                'Error': str(e),
             }
         )
         return response, 401
@@ -66,7 +66,7 @@ def error_403(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '403 Forbidden' + str(e),
+                'Error': str(e),
             }
         )
         return response, 403
@@ -84,7 +84,7 @@ def error_405(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '405 Method not allowed' + str(e),
+                'Error': str(e),
             }
         )
         return response, 405
@@ -102,7 +102,7 @@ def error_405(e):
             not request.accept_mimetypes.accept_html:
         response = jsonify(
             {
-                'Error': '500 Internal server error' + str(e),
+                'Error': str(e),
             }
         )
         return response, 500
