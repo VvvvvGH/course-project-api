@@ -1,98 +1,103 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>{{ error_msg }}</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'font.css') }}" />
-  <style type="text/css">
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block title %}
+<span class="mdl-layout-title">ERROR {{　error_code }}</span>
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+
+{% block content %}
+
+<style>
+
+    .mdl-dialog-custom {
+        border: none;
+        box-shadow: 0 9px 46px 8px rgba(0, 0, 0, 0.14), 0 11px 15px -7px rgba(0, 0, 0, 0.12), 0 24px 38px 3px rgba(0, 0, 0, 0.2);
+        width: 70%;
+        margin-top: 5%;
+        zoom: 1.5;
     }
 
-    body {
-      font-family: "Whitney SSm A", "Whitney SSm B", "Helvetica Neue", Helvetica, Arial, Sans-Serif;
-      background-color: #2D72D9;
-      color: #fff;
-      -moz-font-smoothing: antialiased;
-      -webkit-font-smoothing: antialiased;
+    .mdl-dialog__title {
+        padding: 24px 24px 0;
+        margin: 0;
+        font-size: 2.5rem;
     }
 
-    .error-container {
-      text-align: center;
-      height: 100%;
+    .mdl-dialog__actions {
+        padding: 8px 8px 8px 24px;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-flex-direction: row-reverse;
+        -ms-flex-direction: row-reverse;
+        flex-direction: row-reverse;
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
     }
 
-    @media (max-width: 480px) {
-      .error-container {
-        position: relative;
-        top: 50%;
-        height: initial;
-        -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-        transform: translateY(-50%);
-      }
+    .mdl-dialog__actions > * {
+        margin-right: 8px;
+        height: 36px;
     }
 
-    .error-container h1 {
-      margin: 0;
-      font-size: 130px;
-      font-weight: 300;
+    .mdl-dialog__actions > *:first-child {
+        margin-right: 0;
     }
 
-    @media (min-width: 480px) {
-      .error-container h1 {
-        position: relative;
-        top: 50%;
-        -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-        transform: translateY(-50%);
-      }
+    .mdl-dialog__actions--full-width {
+        padding: 0 0 8px 0;
     }
 
-    @media (min-width: 768px) {
-      .error-container h1 {
-        font-size: 220px;
-      }
+    .mdl-dialog__actions--full-width > * {
+        height: 48px;
+        -webkit-flex: 0 0 100%;
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        padding-right: 16px;
+        margin-right: 0;
+        text-align: right;
     }
 
-    .return {
-      color: rgba(255, 255, 255, 0.6);
-      font-weight: 400;
-      letter-spacing: -0.04em;
-      margin: 0;
+    .mdl-dialog__content {
+        padding: 20px 24px 24px 24px;
+        color: rgba(0, 0, 0, 0.54);
     }
+</style>
 
-    @media (min-width: 480px) {
-      .return {
-        position: absolute;
-        width: 100%;
-        bottom: 30px;
-      }
+
+<dialog id="dialog" class="mdl-dialog-custom">
+    <h3 class="mdl-dialog__title">{{ error_code }}</h3>
+    <div class="mdl-dialog__content">
+        <p>
+            {{ error_msg }}
+        </p>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button type="button" class="mdl-button" onclick="document.location='/'">Return to index</button>
+    </div>
+</dialog>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+    var dialogButton = document.querySelector('.dialog-button');
+    var dialog = document.querySelector('#dialog');
+    if (!dialog.showModal) {
+        dialogPolyfill.registerDialog(dialog);
     }
+    dialog.showModal();
+</script>
+{% endblock %}
 
-    .return a {
-      padding-bottom: 1px;
-      color: #fff;
-      text-decoration: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-      -webkit-transition: border-color 0.1s ease-in;
-      transition: border-color 0.1s ease-in;
-    }
-
-    .return a:hover {
-      border-bottom-color: #fff;
-    }
-  </style>
-</head>
-
-<body>
-
-<div class="error-container">
-  <h1>{{ error_code }}</h1>
-</div>
-
-</body>
-</html>
+{% block basic %}
+{{ super() }}
+{% endblock %}

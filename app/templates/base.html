@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>API 1.0</title>
+    {% endblock %}
+</head>
+<body>
+<!-- Uses a header that contracts as the page scrolls down. -->
+<style>
+    .demo-layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type {
+        padding-right: 0;
+    }
+</style>
+
+<div class="demo-layout-waterfall mdl-layout mdl-js-layout">
+    <header class="mdl-layout__header mdl-layout__header--waterfall">
+        <!-- Top row, always visible -->
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            {% block title %}
+            <span class="mdl-layout-title">Welcome</span>
+            {% endblock %}
+            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+                <label class="mdl-button mdl-js-button mdl-button--icon"
+                       for="waterfall-exp">
+                    <i class="material-icons">search</i>
+                </label>
+                <div class="mdl-textfield__expandable-holder">
+                    <input class="mdl-textfield__input" type="text" name="sample"
+                           id="waterfall-exp">
+                </div>
+            </div>
+        </div>
+        <!-- Bottom row, not visible on scroll -->
+        <div class="mdl-layout__header-row">
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation -->
+            <nav class="mdl-navigation">
+                {% block nav %}
+                {% endblock %}
+            </nav>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        {{ self.title() }}
+        <nav class="mdl-navigation">
+            {{ self.nav() }}
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <div class="page-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+</div>
+
+
+</div>
+</body>
+{% block script %}
+{% endblock %}
+
+{% block basic %}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/material.min.css') }}">
+<script src="{{url_for('static',filename='js/material.min.js')}} "></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+<script src="{{url_for('static',filename='js/jquery.min.js')}}"></script>
+{% endblock %}
+</html>
