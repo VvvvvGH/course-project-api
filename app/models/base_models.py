@@ -2,7 +2,17 @@ from app import db
 import uuid
 import hashlib
 from datetime import datetime
-from app.exceptions import *
+
+
+class Administrator(db.Model):
+    __tablename__ = 'administrator'
+    UUID = db.Column(db.String(40), primary_key=True)
+    UserName = db.Column(db.String(40), nullable=False, unique=True)
+    Password = db.Column(db.String(32), nullable=False)
+    LoginState = db.Column(db.Boolean, default=0)
+    RegistrationDate = db.Column(db.DateTime, nullable=False)
+    LastLoginDate = db.Column(db.DateTime, nullable=False)
+    Authorization = db.Column(db.INT, nullable=False)
 
 
 class UserMixin(db.Model):
@@ -14,12 +24,14 @@ class UserMixin(db.Model):
     Birthday = db.Column(db.Date, nullable=False)
     Email = db.Column(db.String(20), nullable=False, unique=True)
     TelePhone = db.Column(db.String(18), nullable=False)
-    Activated = db.Column(db.BOOLEAN, nullable=False)
-    RegDate = db.Column(db.Date, nullable=False)
-    LastLogin = db.Column(db.Date)
+
+    UserBackground = db.relationship('UserBackground')
+    UserSearchRecord = db.relationship('UserSearchRecord', lazy=True)
+    UserFollow = db.relationship('UserFollow', lazy=True)
 
     def __init__(self, username, password, gender, birthday, email, telephone):
         self.UserName = username
+        self.UUID = uuid.uuid1()
         md5 = hashlib.md5()
         md5.update(password.encode('utf-8'))
         self.Password = md5.hexdigest()
@@ -27,30 +39,81 @@ class UserMixin(db.Model):
         self.Birthday = birthday
         self.Email = email
         self.TelePhone = telephone
-        self.Activated = False
-        self.RegDate = datetime.now().strftime('%Y-%m-%d')
-        self.UUID = uuid.uuid1()
+        self.UserBackground.append(UserBackground(self.UUID))
 
     def __repr__(self):
         return '<User %s>' % self.UserName
 
 
-class UserFocus(db.Model):
-    __tablename__ = 'user_focusproject'
-    UUID = db.Column(db.String(40), primary_key=True, nullable=False)
-    ProjID = db.Column(db.String(200), nullable=False)
+class UserBackground(db.Model):
+    __tablename__ = 'userbackground'
+    # 一对一关系
+    UUID = db.Column(db.String(40), db.ForeignKey('users.UUID'), primary_key=True)
+    LoginState = db.Column(db.Boolean, default=False, nullable=False)
+    Activated = db.Column(db.Boolean, default=False, nullable=False)
+    RegDate = db.Column(db.DateTime, nullable=False)
+    LastLoginDate = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, uuid, project_id):
-        self.UUID = uuid
+    def __init__(self, UUID):
+        self.UUID = UUID,
+        self.RegDate = datetime.now()
+        self.LastLoginDate = datetime.now()
+
+    def __repr__(self):
+        return '<User %s>' % self.UUID
+
+
+# Helper table 中间表
+
+class UserFollow(db.Model):
+    __tablename__ = 'userfollow'
+    ID = db.Column(db.Integer, primary_key=True, nullable=False)
+    UUID = db.Column(db.String(40), db.ForeignKey('users.UUID'), nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('projectfollow.ProjID'), nullable=False)
+    Time = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, UUID, ProjID):
+        self.UUID = UUID,
+        self.ProjID = ProjID
+        self.Time = datetime.now()
+
+    def __repr__(self):
+        return '<User %s>' % self.ProjID
+
+
+class ProjectFollow(db.Model):
+    __tablename__ = 'projectfollow'
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
+    Title = db.Column(db.String(100))
+
+    def __init__(self, project_id, title):
         self.ProjID = project_id
+        self.Title = title
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
 
 
+class UserSearchRecord(db.Model):
+    __tablename__ = 'usersearchrecord'
+    # 一对多关系
+    RecordID = db.Column(db.Integer, primary_key=True, nullable=False)
+    UUID = db.Column(db.String(40), db.ForeignKey('users.UUID'))
+    SearchRecord = db.Column(db.String(120))
+    Time = db.Column(db.DateTime)
+
+    def __init__(self, UUID, search_record):
+        self.UUID = UUID
+        self.SearchRecord = search_record
+        self.Time = datetime.now()
+
+    def __repr__(self):
+        return '<User %s>' % self.UUID
+
+
 class Bidders(db.Model):
     __tablename__ = 'bidders'
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     Biders = db.Column(db.String(25))
     FinalPrice = db.Column(db.String(10))
     IsQualified = db.Column(db.String(5))
@@ -66,7 +129,7 @@ class Bidders(db.Model):
 
 class BidNotice(db.Model):
     __tablename__ = 'bidnotice'
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     ProjTitle = db.Column(db.String(100))
     ProjBud = db.Column(db.String(10))
     PurMethod = db.Column(db.String(10))
@@ -85,6 +148,7 @@ class BidNotice(db.Model):
     Manager = db.Column(db.String(25))
     ReviewComment = db.Column(db.String(250))
     AnnounceDDL = db.Column(db.Date)
+    ReleaseDate = db.Column(db.Date)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -92,19 +156,10 @@ class BidNotice(db.Model):
 
 class CorrectedNotice(db.Model):
     __tablename__ = 'correctionnotice'
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     Content = db.Column(db.String(1000))
     City = db.Column(db.String(10))
-
-    def __repr__(self):
-        return '<Project %s>' % self.ProjID
-
-
-class ProjectFollow(db.Model):
-    __tablename__ = 'focusproject'
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
-    Title = db.Column(db.String(100))
-    Time = db.Column(db.Date)
+    ReleaseDate = db.Column(db.Date)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -128,6 +183,7 @@ class PurchaseNotice(db.Model):
     BidBond = db.Column(db.String(10))
     Publisher = db.Column(db.String(40))
     Attachment = db.Column(db.String(50))
+    ReleaseDate = db.Column(db.Date)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -136,7 +192,7 @@ class PurchaseNotice(db.Model):
 class Purchaser(db.Model):
     __tablename__ = 'purchasers'
 
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     Purchaser = db.Column(db.String(50))
     Contacts = db.Column(db.String(50))
     ProjContacts = db.Column(db.String(10))
@@ -150,7 +206,7 @@ class Purchaser(db.Model):
 
 class PurchaseAgent(db.Model):
     __tablename__ = 'purchasingagents'
-    ProjID = db.Column(db.String(100), primary_key=True, nullable=False)
+    ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     Agency = db.Column(db.String(50))
     AgencyAddr = db.Column(db.String(50))
     Contacts = db.Column(db.String(50))
@@ -161,3 +217,17 @@ class PurchaseAgent(db.Model):
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
+
+
+class CrawerURL(db.Model):
+    __tablename__ = 'crawerurl'
+    URL = db.Column(db.String(100), primary_key=True)
+    City = db.Column(db.String(10))
+    Type = db.Column(db.String(20))
+    UpdatedColumnNum = db.Column(db.INT)
+    Success = db.Column(db.Boolean)
+    Time = db.Column(db.DateTime)
+    ErrorRecord = db.Column(db.String(200))
+
+    def __repr__(self):
+        return '<Project %s>' % self.URL

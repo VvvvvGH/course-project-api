@@ -1,4 +1,4 @@
-from app.models import *
+from app.models.base_models import *
 from app import db
 from sqlalchemy import func
 

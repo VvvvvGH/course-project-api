@@ -1,9 +1,7 @@
 from . import api
 from flask import jsonify, request
 from flasgger import swag_from
-from app import db
-from app.models import *
-from .user_models import *
+from app.models.users import *
 from sqlalchemy import exc
 
 
@@ -43,9 +41,7 @@ def reset_password():
     """
     密码重置
     """
-    data = {
-        'message': '验证成功，密码重置链接已经发送到邮箱'
-    }
+    data = User.reset_password(email=request.json['email'], username=request.json['userName'])
     return jsonify(data)
 
 
@@ -55,6 +51,8 @@ def follow_list_add():
     """
     添加项目到关注列表
     """
+    user = User.query.filter_by(UUID="1c64ba58-455b-11e8-bf9c-00dbdfbc5c37").first_or_404()
+    result = user.add_follow_project(project_id=request.json['project_id'])
     data = {
         'message': '项目添加成功/项目ID不存在'
     }
@@ -68,24 +66,23 @@ def follow_list():
     关注列表
     """
 
-    project = UserFocus.query.filter_by(UUID="1c64ba58-455b-11e8-bf9c-00dbdfbc5c37").first_or_404()
+    if 'CurrentPage' in request.args:
+        current_page = int(request.args['CurrentPage'])
+    else:
+        current_page = 1
+    if 'ItemsPerPage' in request.args:
+        items_per_page = int(request.args['ItemsPerPage'])
+    else:
+        items_per_page = 10
+    project = User.query.filter_by(UUID="14defa08-510b-11e8-ae6e-00dbdfbc5c37").first_or_404().get_follow_list(
+        current_page=current_page, items_per_page=items_per_page)
     data = {
         "Page": {
-            "PageCount": 1,
-            "CurrentPage": 1,
-            "ItemsPerPage": 10,
+            "PageCount": project[0],
+            "CurrentPage": project[1],
+            "ItemsPerPage": project[2],
         },
-        "Project": [
-            {
-                "ProjID": project.ProjID,
-                "ProjTitle": "项目名称",
-                "City": "city",
-                "PubDate": "2018-4-21",
-                "DDL": "2018-4-25",
-                "Type": "{procurement_notices, correction_notice, bid_notice}",
-                "URL": "/project/bid_notice/" + project.ProjID
-            }
-        ]
+        "Project": project[3]
     }
     return jsonify(data)
 
