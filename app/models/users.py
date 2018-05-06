@@ -52,8 +52,8 @@ class User(UserMixin, UserMixinLogin, db.Model):
 
     def to_json(self):
         json_data = {
-            "activated": self.Activated,
-            "last_login": self.LastLogin,
+            "activated": self.UserBackground[0].Activated,
+            "last_login": self.UserBackground[0].LastLoginDate,
             "login_state": False,  # TODO: Login state
             "subscriptions": "/user/subs",
             "username": self.UserName,
