@@ -32,9 +32,7 @@ class UserMixin(db.Model):
     def __init__(self, username, password, gender, birthday, email, telephone):
         self.UserName = username
         self.UUID = uuid.uuid1()
-        md5 = hashlib.md5()
-        md5.update(password.encode('utf-8'))
-        self.Password = md5.hexdigest()
+        self.Password = hashlib.md5(password.encode('utf-8')).hexdigest()
         self.Gender = gender
         self.Birthday = birthday
         self.Email = email
@@ -141,14 +139,14 @@ class BidNotice(db.Model):
     Currency = db.Column(db.String(5))
     UnitPrice = db.Column(db.String(10))
     FinalPrice = db.Column(db.String(10))
-    ReviewDate = db.Column(db.Date)
+    ReviewDate = db.Column(db.DateTime)
     ReviewAddr = db.Column(db.String(40))
     Attachment = db.Column(db.String(50))
     ReviewCommittee = db.Column(db.String(30))
     Manager = db.Column(db.String(25))
     ReviewComment = db.Column(db.String(250))
-    AnnounceDDL = db.Column(db.Date)
-    ReleaseDate = db.Column(db.Date)
+    AnnounceDDL = db.Column(db.DateTime)
+    ReleaseDate = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -159,7 +157,7 @@ class CorrectedNotice(db.Model):
     ProjID = db.Column(db.String(100), db.ForeignKey('procurementnotices.ProjID'), primary_key=True, nullable=False)
     Content = db.Column(db.String(1000))
     City = db.Column(db.String(10))
-    ReleaseDate = db.Column(db.Date)
+    ReleaseDate = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -174,16 +172,16 @@ class PurchaseNotice(db.Model):
     PurQuantity = db.Column(db.String(5))
     ProjReqURL = db.Column(db.String(50))
     SupplierQuals = db.Column(db.String(50))
-    DDL = db.Column(db.Date)
-    AnnunceDDL = db.Column(db.Date)
-    BidStartTime = db.Column(db.Date)
-    PubDate = db.Column(db.Date)
+    DDL = db.Column(db.DateTime)
+    AnnunceDDL = db.Column(db.DateTime)
+    BidStartTime = db.Column(db.DateTime)
+    PubDate = db.Column(db.DateTime)
     Addr = db.Column(db.String(40))
     BidStartAddr = db.Column(db.String(40))
     BidBond = db.Column(db.String(10))
     Publisher = db.Column(db.String(40))
     Attachment = db.Column(db.String(50))
-    ReleaseDate = db.Column(db.Date)
+    ReleaseDate = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<Project %s>' % self.ProjID
@@ -220,7 +218,7 @@ class PurchaseAgent(db.Model):
 
 
 class CrawerURL(db.Model):
-    __tablename__ = 'crawerurl'
+    __tablename__ = 'crawlerurl'
     URL = db.Column(db.String(100), primary_key=True)
     City = db.Column(db.String(10))
     Type = db.Column(db.String(20))

@@ -4,38 +4,11 @@ from app.models.base_models import *
 from app.exceptions import *
 from app import db
 from app import mail
-from app import login_manager
 from flask_mail import Message
-from flask_login import UserMixin as UserMixinLogin
 from flask import current_app as app
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
-
-
-class User(UserMixin, UserMixinLogin, db.Model):
-
-    @staticmethod
-    def get(user_id):
-        # 　It should return None (not raise an exception) if the ID is not valid.
-        # 　(In that case, the ID will manually be removed from the session and processing will continue.)
-        user = User.query.filter_by(UUID=user_id).first()
-        if user:
-            return user
-        else:
-            return None
-
-    def get_id(self):
-        return self.UUID.encode("utf-8")
-
-    def is_active(self):
-        user = UserBackground.query.filter_by(UUID=self.UUID).first()
-        if user.Activated:
-            return True
-        else:
-            return False
+class User(UserMixin, db.Model):
 
     @staticmethod
     def from_json(json):
@@ -106,8 +79,9 @@ class User(UserMixin, UserMixinLogin, db.Model):
         # 项目不存在，而且不在关注列表内　错误
         elif not notice:
             app.logger.error("The project does not exists")
+            return "项目添加失败：项目不存在"
         # 添加项目关注
-        elif notice:
+        if notice:
             user_follow = UserFollow(UUID=self.UUID, ProjID=project_id)
             try:
                 self.UserFollow.append(user_follow)
@@ -115,16 +89,9 @@ class User(UserMixin, UserMixinLogin, db.Model):
             except Exception as e:
                 app.logger.error("Insert user follow project error" + str(e))
                 db.session.rollback()
+            return "项目添加成功"
 
     def del_follow_project(self, project_id):
-        project_follow = ProjectFollow.query.filter_by(ProjID=project_id).all()
-        # 若项目只被一个用户关注，直接在项目关注列表内删除
-        if len(project_follow) == 1:
-            try:
-                db.session.delete(project_follow[0])
-            except Exception as e:
-                app.logger.error("Delete project in project follow  failed" + str(e))
-                db.session.rollback()
         # 在用户关注列表内移除该项目
         user_follow = UserFollow.query.filter_by(ProjID=project_id, UUID=self.UUID).first()
         if user_follow:
@@ -133,6 +100,19 @@ class User(UserMixin, UserMixinLogin, db.Model):
             except Exception as e:
                 app.logger.error("Delete project in user follow failed" + str(e))
                 db.session.rollback()
+
+        project_follow = ProjectFollow.query.filter_by(ProjID=project_id).all()
+        if not project_follow:
+            return "项目删除失败：项目不存在"
+        # 若项目只被一个用户关注，直接在项目关注列表内删除
+        if len(project_follow) == 1:
+            try:
+                db.session.delete(project_follow[0])
+            except Exception as e:
+                app.logger.error("Delete project in project follow  failed" + str(e))
+                db.session.rollback()
+
+        return "项目删除成功"
 
     def get_follow_list(self, items_per_page, current_page):
         follow_list = UserFollow.query.filter_by(UUID=self.UUID).all()

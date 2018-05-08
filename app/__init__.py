@@ -3,9 +3,7 @@ from config import config
 from flasgger import Swagger
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from werkzeug.contrib.fixers import ProxyFix
-
 from logging.config import dictConfig
 
 dictConfig({
@@ -27,7 +25,6 @@ dictConfig({
 db = SQLAlchemy(use_native_unicode='utf8')
 mail = Mail()
 swagger = Swagger()
-login_manager = LoginManager()
 
 
 def create_app(config_name):
@@ -47,8 +44,6 @@ def create_app(config_name):
     from .main import main as main_route
     app.register_blueprint(main_route, url_prefix='/')
 
-    # 用户登陆
-    login_manager.init_app(app)
 
     # 数据库
     db.init_app(app)
