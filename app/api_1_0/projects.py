@@ -61,7 +61,6 @@ def project_ended(ProjectID):
 @api.route('/project', methods=['GET'])
 @swag_from('api_specs_yml/project/project.yml')
 def project_basic_info():
-    # TODO: Get data from MySQL
     """
     项目各城市统计信息
     城市分类链接
@@ -73,7 +72,6 @@ def project_basic_info():
 @api.route('/project/cities', methods=['GET'])
 @swag_from('api_specs_yml/project/cities.yml')
 def city_list():
-    # TODO: Get data from MySQL
     """
     城市列表
     """
@@ -85,41 +83,15 @@ def city_list():
     return jsonify(data)
 
 
-@api.route('/project/cities/<string:city>', methods=['GET'])
-@swag_from('api_specs_yml/project/project_city.yml')
-def city(city):
-    # TODO: Get data from MySQL
-    """
-    城市下的项目列表
-    """
-    # FIXME: Fix this list
-    data = {
-        "Page": {
-            "PageCount": 100,
-            "CurrentPage": 1,
-            "ItemsPerPage": 10,
-        },
-        "Project": [
-            {
-                "ProjID": "adsa",
-                "ProjTitle": "项目名称",
-                "City": city,
-                "PubDate": "2018-4-21",
-                "DDL": "2018-4-25",
-                "Type": "{procurement_notices, correction_notice, bid_notice}"
-            }
-        ]
-    }
-    return jsonify(data)
-
-
 @api.route('/project/project_list', methods=['GET'])
 @swag_from('api_specs_yml/project/project_list.yml')
 def project_list():
-    # TODO: Get data from MySQL
     """
     项目列表
     """
+
+    city_list = ['GD', 'GZ', 'SZ', 'ZH', 'ST', 'SG', 'FS', 'JM', 'ZJ', 'MM', 'HZ', 'MZ', 'SW', 'HY', 'YZ', 'QY',
+                 'DG', 'ZS', 'JY', 'YF', 'SD']
 
     if 'CurrentPage' in request.args:
         current_page = int(request.args['CurrentPage'])
@@ -129,8 +101,19 @@ def project_list():
         items_per_page = int(request.args['ItemsPerPage'])
     else:
         items_per_page = 10
-
     project_type = request.args['ProjectType']
+    city = None
+    search_token = None
+    if 'City' in request.args and request.args['City'].upper() in city_list:
+        city = request.args['City'].upper()
+    if 'SearchToken' in request.args:
+        search_token = request.args['SearchToken']
+        # 　若用户已登录　添加搜索记录
+        if auth.username():
+            user = User.query.filter_by(UserName=auth.username()).first()
+            if user:
+                user.add_search_record(search_token)
+
     data = ProjectList(current_page=current_page, items_per_page=items_per_page,
-                       project_type=project_type).to_json()
+                       project_type=project_type, city=city, search_token=search_token).to_json()
     return jsonify(data)

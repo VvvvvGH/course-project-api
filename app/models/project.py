@@ -1,6 +1,6 @@
 from app.models.base_models import *
 from app import db
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 
 class ProjectOngoing(PurchaseNotice, db.Model):
@@ -84,7 +84,6 @@ class CityStatics(object):
             if total_count:
                 city_data = {
                     "City": city,
-                    "URL": "/project/cities/" + city,
                     "TotalNumber": total_count,
                     "procurement_notices": ongoing_count,
                     "correction_notice": corrected_count,
@@ -109,37 +108,41 @@ class CityStatics(object):
 
 
 class ProjectList(object):
-    def __init__(self, current_page, items_per_page, project_type):
+    def __init__(self, current_page, items_per_page, project_type, city, search_token):
         self.current_page = current_page
         self.items_per_page = items_per_page
         self.project_type = int(project_type)
+        self.city = city
+        self.search_token = search_token
+        self.switch = switch = {
+            0: PurchaseNotice,
+            1: ProjectCorrected,
+            2: ProjectEnded,
+        }
+
+    def search(self):
+        ProjectOngoing.query.all()
 
     def get_project_count(self):
-        switch = {
-            0: PurchaseNotice,
-            1: ProjectCorrected,
-            2: ProjectEnded,
-        }
-        return db.session.query(func.count(switch[self.project_type].ProjID)).first()[0]
+
+        return db.session.query(func.count(self.switch[self.project_type].ProjID)).first()[0]
 
     def get_project_ids(self):
-        switch = {
-            0: PurchaseNotice,
-            1: ProjectCorrected,
-            2: ProjectEnded,
-        }
-        # FIXME: 排序
-        return switch[self.project_type].query.order_by(switch[self.project_type].ProjID).paginate(self.current_page,
-                                                                                                   per_page=self.items_per_page,
-                                                                                                   error_out=False)
+
+        # 根据发布时间排序
+        # 根据城市过滤
+        sql_query = self.switch[self.project_type].query
+        if self.city:
+            sql_query = sql_query.filter_by(City=self.city)
+        if self.search_token:
+            sql_query = sql_query.filter(
+                or_(ProjectOngoing.ProjTitle.like("%%%s%%" % self.search_token),
+                    ProjectOngoing.ProjID.like("%%%s%%" % self.search_token)))
+
+        return sql_query
 
     def get_project_info(self, project_id):
-        switch = {
-            0: PurchaseNotice,
-            1: ProjectCorrected,
-            2: ProjectEnded,
-        }
-        return switch[self.project_type].query.filter_by(ProjID=str(project_id)).first_or_404()
+        return self.switch[self.project_type].query.filter_by(ProjID=str(project_id)).first_or_404()
 
     def to_json(self):
         data = {
@@ -151,7 +154,14 @@ class ProjectList(object):
             "Project": []
         }
         types = ["采购公告", "更正公告", "结果公告"]
-        for item in self.get_project_ids().items:
+        project_ids = self.get_project_ids().order_by(self.switch[self.project_type].ReleaseDate) \
+            .paginate(
+            self.current_page,
+            per_page=self.items_per_page,
+            error_out=False
+        ).items
+
+        for item in project_ids:
             project = self.get_project_info(item.ProjID)
             if self.project_type == 0:
                 project_info = {
@@ -166,10 +176,7 @@ class ProjectList(object):
             elif self.project_type == 1:
                 project_info = {
                     "ProjID": project.ProjID,
-                    # "ProjTitle": project.ProjTitle,
                     "City": project.City,
-                    # "PubDate": project.PubDate,
-                    # "DDL": project.PubDate,
                     "Type": types[self.project_type],
                     "URL": "/project/bid_notice/" + project.ProjID
                 }
@@ -179,8 +186,6 @@ class ProjectList(object):
                     "ProjID": project.ProjID,
                     "ProjTitle": project.ProjTitle,
                     "City": project.City,
-                    # "PubDate": project.PubDate,
-                    # "DDL": project.PubDate,
                     "Type": types[self.project_type],
                     "URL": "/project/bid_notice/" + project.ProjID
                 }

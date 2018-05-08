@@ -28,8 +28,6 @@ definitions:
               properties:
                 City:
                   type: string
-                URL:
-                  type: string
                 TotalNumber:
                   type: integer
                 procurement_notices:

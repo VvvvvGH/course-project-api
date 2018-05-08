@@ -13,13 +13,9 @@ parameters:
     type: string
     description: 项目城市 GZ FS
   - in: query
-    name: OrderByStartTime
-    description:  默认是order by start time
-    type: boolean
-  - in: query
-    name: OrderByDDL
-    type: boolean
-    description: 根据ddl排序
+    name: SearchToken
+    type: string
+    description: 搜索关键字
   - in: query
     name: CurrentPage
     required: ture
