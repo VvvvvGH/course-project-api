@@ -1,30 +1,9 @@
 from . import api
-from flask import jsonify, request, abort
+from flask import jsonify, request
 from flasgger import swag_from
 from app.models.users import *
 from sqlalchemy import exc
-from flask_httpauth import HTTPBasicAuth
-
-# 用户登陆
-auth = HTTPBasicAuth()
-
-
-@auth.get_password
-def get_password(username):
-    user_data = User.query.filter_by(UserName=str(username)).first_or_404()
-    if user_data:
-        return user_data.Password
-    return None
-
-
-@auth.hash_password
-def hash_pw(password):
-    return hashlib.md5(password.encode('utf-8')).hexdigest()
-
-
-@auth.error_handler
-def error_handler():
-    abort(401)
+from .auth import auth
 
 
 @api.route('/user', methods=['GET'])
@@ -54,8 +33,9 @@ def register():
         db.session.rollback()
         return jsonify({"error": "User add failed."})
 
-    user_data = User.query.filter_by(UserName=request.json['userName']).first_or_404().to_json()
-    return jsonify(user_data)
+    user = User.query.filter_by(UserName=request.json['userName']).first_or_404()
+    user.send_activate_email()
+    return jsonify(user.to_json())
 
 
 @api.route('/user/reset_password', methods=['POST'])

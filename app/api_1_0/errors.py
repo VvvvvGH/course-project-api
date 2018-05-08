@@ -113,3 +113,8 @@ def error_405(e):
 @api.app_errorhandler(ValidationError)
 def validation_error(e):
     return error_400(e)
+
+
+@api.app_errorhandler(UserNotActivatedError)
+def user_not_activated_error(e):
+    return error_403(e)

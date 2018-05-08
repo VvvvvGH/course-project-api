@@ -1,4 +1,6 @@
 import re
+import hashlib
+import base64
 import datetime
 from app.models.base_models import *
 from app.exceptions import *
@@ -6,6 +8,7 @@ from app import db
 from app import mail
 from flask_mail import Message
 from flask import current_app as app
+from flask import url_for
 
 
 class User(UserMixin, db.Model):
@@ -34,6 +37,20 @@ class User(UserMixin, db.Model):
         }
         return json_data
 
+    def send_activate_email(self):
+        msg = Message("Hello",
+                      sender="os_project_api@yeah.net",
+                      recipients=['%s' % self.Email])
+        msg.body = "你好 %s，点击链接。%s" % (self.UserName, self.generate_activate_token())
+        mail.send(msg)
+        app.logger.info("用户 %s 激活邮件已发送" % self.UserName)
+
+    def generate_activate_token(self):
+        if not self.UserBackground[0].Activated:
+            token = str(base64.b64encode(self.UUID.encode('utf-8'))) + hashlib.md5(
+                self.Password.encode('utf-8')).hexdigest()
+            return url_for('api.activate', activate_token=token, _external=True)
+
     @staticmethod
     def reset_password(email, username):
         UserValidator.validate_email(email)
@@ -43,7 +60,7 @@ class User(UserMixin, db.Model):
             msg = Message("Hello",
                           sender="os_project_api@yeah.net",
                           recipients=['%s' % email])
-            msg.body = "你好 %s，跨越长城，走向世界。" % username
+            msg.body = "你好 %s，点击链接 %s" % username
             mail.send(msg)
             data = {
                 'message': '验证成功，密码重置链接已经发送到邮箱。如果收不到邮件，请在垃圾箱中查找。'
@@ -60,7 +77,7 @@ class User(UserMixin, db.Model):
         try:
             db.session.commit()
         except:
-            app.logger.error("")
+            app.logger.error("添加搜索记录失败")
             db.session.rollback()
 
     def add_follow_project(self, project_id):

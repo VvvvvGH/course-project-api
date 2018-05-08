@@ -1,7 +1,9 @@
 from . import api
 from flask import jsonify, request
 from flasgger import swag_from
+from .auth import auth
 from app.models.project import *
+from app.models.users import User
 
 
 @api.route('/')

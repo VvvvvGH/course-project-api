@@ -6,5 +6,4 @@ api = Blueprint('api', __name__)
 from . import projects
 from . import users
 from . import errors
-from . import authentication
-from . import decorators
+from . import auth
