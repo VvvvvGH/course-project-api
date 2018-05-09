@@ -1,9 +1,10 @@
-from . import api
+from sqlalchemy import exc
 from flask import jsonify, request
 from flasgger import swag_from
-from app.models.users import *
-from sqlalchemy import exc
+from app.models.users import User
+from app import db
 from .auth import auth
+from . import api
 
 
 @api.route('/user', methods=['GET'])
@@ -33,9 +34,9 @@ def register():
         db.session.rollback()
         return jsonify({"error": "User add failed."})
 
-    user = User.query.filter_by(UserName=request.json['userName']).first_or_404()
-    user.send_activate_email()
-    return jsonify(user.to_json())
+    new_user = User.query.filter_by(UserName=request.json['userName']).first_or_404()
+    new_user.send_activate_email()
+    return jsonify(new_user.to_json())
 
 
 @api.route('/user/reset_password', methods=['POST'])
@@ -55,8 +56,8 @@ def follow_list_add():
     """
     添加项目到关注列表
     """
-    user = User.query.filter_by(UserName=auth.username()).first_or_404()
-    result = user.add_follow_project(project_id=request.json['project_id'])
+    this_user = User.query.filter_by(UserName=auth.username()).first_or_404()
+    result = this_user.add_follow_project(project_id=request.json['project_id'])
     data = {
         'message': result
     }
@@ -70,8 +71,8 @@ def follow_list_delete():
     """
     从关注列表删除项目
     """
-    user = User.query.filter_by(UserName=auth.username()).first_or_404()
-    result = user.del_follow_project(project_id=request.json['project_id'])
+    this_user = User.query.filter_by(UserName=auth.username()).first_or_404()
+    result = this_user.del_follow_project(project_id=request.json['project_id'])
     data = {
         'message': result
     }
@@ -119,8 +120,8 @@ def subscriptions():
             'message': request.args['subs_filter']
         }
         return jsonify(data)
-    else:
-        data = {
-            'message': '订阅信息添加成功/订阅信息错误'
-        }
-        return jsonify(data)
+
+    data = {
+        'message': '订阅信息添加成功/订阅信息错误'
+    }
+    return jsonify(data)

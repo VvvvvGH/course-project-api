@@ -2,13 +2,14 @@ import re
 import hashlib
 import base64
 import datetime
-from app.models.base_models import *
-from app.exceptions import *
-from app import db
-from app import mail
 from flask_mail import Message
 from flask import current_app as app
 from flask import url_for
+from app.models.base_models import UserMixin, UserFollow, UserSearchRecord, PurchaseNotice, ProjectFollow, \
+    CorrectedNotice, BidNotice
+from app.exceptions import ValidationError
+from app import db
+from app import mail
 
 
 class User(UserMixin, db.Model):
@@ -31,7 +32,7 @@ class User(UserMixin, db.Model):
             "activated": self.UserBackground[0].Activated,
             "last_login": self.UserBackground[0].LastLoginDate,
             "login_state": False,  # TODO: Login state
-            "subscriptions": "/user/subs",
+            "subscriptions": "/user/subscriptions",
             "username": self.UserName,
             "uuid": self.UUID
         }
@@ -72,7 +73,6 @@ class User(UserMixin, db.Model):
         return data
 
     def add_search_record(self, search_record):
-        time = datetime.now()
         self.UserSearchRecord.append(UserSearchRecord(UUID=self.UUID, search_record=search_record))
         try:
             db.session.commit()
@@ -135,7 +135,7 @@ class User(UserMixin, db.Model):
         follow_list = UserFollow.query.filter_by(UUID=self.UUID).all()
         page_count = len(follow_list) // items_per_page
         # 分页
-        follow_list = follow_list[items_per_page * (current_page - 1):items_per_page * (current_page)]
+        follow_list = follow_list[items_per_page * (current_page - 1):items_per_page * current_page]
         project_info_list = []
 
         for project in follow_list:
@@ -151,28 +151,14 @@ class User(UserMixin, db.Model):
             })
         return page_count, current_page, items_per_page, project_info_list
 
-    def check_project_types(self, project_id):
+    @staticmethod
+    def check_project_types(project_id):
         project_types = [PurchaseNotice, CorrectedNotice, BidNotice]
         types = []
         for ptype in project_types:
             if ptype.query.filter_by(ProjID=project_id).first():
                 types.append(ptype.__tablename__)
         return types
-
-
-"""
-class UserFollowOp(UserFollow):
-    @staticmethod
-    def add_follow(project_id):
-        project = PurchaseNotice.query.filter_by(ProjID=project_id).first_or_404()
-        # TODO: Get current user
-        # new_follow = UserFollow(project_id=project_id,uuid=)
-
-    @staticmethod
-    def del_follow(project_id):
-        project = PurchaseNotice.query.filter_by(ProjID=project_id).first_or_404()
-        # TODO: Get current user
-"""
 
 
 class UserValidator:

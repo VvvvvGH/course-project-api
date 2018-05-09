@@ -1,7 +1,7 @@
-from app import db
 import uuid
 import hashlib
 from datetime import datetime
+from app import db
 
 
 class Administrator(db.Model):

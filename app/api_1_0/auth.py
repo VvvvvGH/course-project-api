@@ -1,11 +1,11 @@
+import hashlib
+import base64
+import re
 from flask_httpauth import HTTPBasicAuth
 from flask import abort, jsonify
 from . import api
 from ..exceptions import UserNotActivatedError
 from app.models.users import User
-import hashlib
-import base64
-import re
 
 # 用户登陆
 auth = HTTPBasicAuth()
@@ -35,9 +35,9 @@ def error_handler():
 @api.route('user/activate/<activate_token>', methods=['GET'])
 def activate(activate_token):
     token = re.findall("b\'([A-z\d]+)\'([a-z\d]+)", activate_token)[0]
-    user = User.query.filter_by(UUID=base64.b64decode(token[0]).decode('utf-8')).first()
-    if user and hashlib.md5(user.Password.encode('utf-8')).hexdigest() == token[1] and user.UserBackground[
-        0].Activated == 0:
-        user.UserBackground[0].Activated = 1
+    this_user = User.query.filter_by(UUID=base64.b64decode(token[0]).decode('utf-8')).first()
+    if this_user and hashlib.md5(this_user.Password.encode('utf-8')).hexdigest() == token[1] \
+            and this_user.UserBackground[0].Activated == 0:
+        this_user.UserBackground[0].Activated = 1
         return jsonify({"message": "激活成功，用户已激活"})
     return jsonify({"message": "激活失败"})

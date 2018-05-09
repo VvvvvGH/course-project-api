@@ -1,10 +1,10 @@
+from logging.config import dictConfig
 from flask import Flask
-from config import config
 from flasgger import Swagger
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.contrib.fixers import ProxyFix
-from logging.config import dictConfig
+from config import config
 
 dictConfig({
     'version': 1,
@@ -43,7 +43,6 @@ def create_app(config_name):
     # 注册Main
     from .main import main as main_route
     app.register_blueprint(main_route, url_prefix='/')
-
 
     # 数据库
     db.init_app(app)

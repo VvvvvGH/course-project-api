@@ -1,6 +1,6 @@
-from app.models.base_models import *
-from app import db
 from sqlalchemy import func, or_
+from app.models.base_models import BidNotice, CorrectedNotice, PurchaseNotice
+from app import db
 
 
 class ProjectOngoing(PurchaseNotice, db.Model):
@@ -62,7 +62,8 @@ class ProjectEnded(BidNotice, db.Model):
 
 class CityStatics(object):
 
-    def count_all(self):
+    @staticmethod
+    def count_all():
         ongoing_count = db.session.query(func.count(PurchaseNotice.ProjID)).first()[0]
         ended_count = db.session.query(func.count(BidNotice.ProjID)).first()[0]
         corrected_count = db.session.query(func.count(CorrectedNotice.ProjID)).first()[0]
@@ -114,14 +115,11 @@ class ProjectList(object):
         self.project_type = int(project_type)
         self.city = city
         self.search_token = search_token
-        self.switch = switch = {
+        self.switch = {
             0: PurchaseNotice,
             1: ProjectCorrected,
             2: ProjectEnded,
         }
-
-    def search(self):
-        ProjectOngoing.query.all()
 
     def get_project_count(self):
 
@@ -154,8 +152,7 @@ class ProjectList(object):
             "Project": []
         }
         types = ["采购公告", "更正公告", "结果公告"]
-        project_ids = self.get_project_ids().order_by(self.switch[self.project_type].ReleaseDate) \
-            .paginate(
+        project_ids = self.get_project_ids().order_by(self.switch[self.project_type].ReleaseDate).paginate(
             self.current_page,
             per_page=self.items_per_page,
             error_out=False
@@ -163,6 +160,7 @@ class ProjectList(object):
 
         for item in project_ids:
             project = self.get_project_info(item.ProjID)
+            project_info = {}
             if self.project_type == 0:
                 project_info = {
                     "ProjID": project.ProjID,
