@@ -1,7 +1,7 @@
 import re
 import hashlib
 import base64
-import datetime
+from datetime import datetime
 from flask_mail import Message
 from flask import current_app as app
 from flask import url_for
@@ -42,7 +42,7 @@ class User(UserMixin, db.Model):
         msg = Message("Hello",
                       sender="os_project_api@yeah.net",
                       recipients=['%s' % self.Email])
-        msg.body = "你好 %s，点击链接。%s" % (self.UserName, self.generate_activate_token())
+        msg.body = "你好 %s，点击链接激活账号。%s" % (self.UserName, self.generate_activate_token())
         mail.send(msg)
         app.logger.info("用户 %s 激活邮件已发送" % self.UserName)
 

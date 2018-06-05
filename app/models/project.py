@@ -169,14 +169,12 @@ class ProjectList(object):
                     "PubDate": project.PubDate,
                     "DDL": project.PubDate,
                     "Type": types[self.project_type],
-                    "URL": "/project/bid_notice/" + project.ProjID
                 }
             elif self.project_type == 1:
                 project_info = {
                     "ProjID": project.ProjID,
                     "City": project.City,
                     "Type": types[self.project_type],
-                    "URL": "/project/bid_notice/" + project.ProjID
                 }
 
             elif self.project_type == 2:
@@ -185,7 +183,6 @@ class ProjectList(object):
                     "ProjTitle": project.ProjTitle,
                     "City": project.City,
                     "Type": types[self.project_type],
-                    "URL": "/project/bid_notice/" + project.ProjID
                 }
             data['Project'].append(project_info)
         return data
