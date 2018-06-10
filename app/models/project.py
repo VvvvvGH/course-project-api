@@ -11,7 +11,7 @@ class ProjectOngoing(PurchaseNotice, db.Model):
             "City": self.City,
             "ProjBud": self.ProjBud,
             "PurQuantity": self.PurQuantity,
-            "ProjReqURL": self.ProjReqURL,
+            "ProjReq": self.ProjReq,
             "SupplierQuals": self.SupplierQuals,
             "DDL": self.DDL,
             "Addr": self.Addr,

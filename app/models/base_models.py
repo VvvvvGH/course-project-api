@@ -170,7 +170,7 @@ class PurchaseNotice(db.Model):
     City = db.Column(db.String(10))
     ProjBud = db.Column(db.String(50))
     PurQuantity = db.Column(db.String(50))
-    ProjReqURL = db.Column(db.String(100))
+    ProjReq = db.Column(db.String(1800))
     SupplierQuals = db.Column(db.String(200))
     DDL = db.Column(db.DateTime)
     AnnunceDDL = db.Column(db.DateTime)
